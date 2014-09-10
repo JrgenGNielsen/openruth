@@ -224,6 +224,8 @@ function openruth_reservation_options_submit($account, $values) {
   // one selected.
   if (!$profile_branch) {
     $wrapper->field_openruth_preferred_branch->set($values['openruth_preferred_branch']);
+
+    // Save the profile it's field have been updated in the wrapper.
     $profile->save();
   }
 }
@@ -277,7 +279,7 @@ function openruth_reservation_create($account, $id, $options = array(), $expiry 
   $order_res = openruth_client_invoke('order_item', $creds['name'], $id, 1, date('c', time()), date('Y-m-d', time() + $expiry), $branch);
   $order = array_shift($order_res);
   if ($order == 1) {
-    // =rder success; refresh cache.
+    // Order success; refresh cache.
     _openruth_user_status($creds, TRUE);
     $order_res['branch'] = $branch;
     // @todo: It seems like this function returns a response directly from the

@@ -36,12 +36,8 @@ function openruth_availability_holdings($provider_ids, $reset = FALSE) {
       if (is_array($details->holding)) {
         foreach ($details->holding as $holding) {
           // Find the holdings availability.
-          $available = FALSE;
-          $reservable = FALSE;
-          if (isset($holding)) {
-            $available = $holding->agencyHoldings->itemAvailability == 'copies available for loan and reservation';
-            $reservable = $available || $holding->agencyHoldings->itemAvailability == 'no copies available, but item can be reserved';
-          }
+          $available = $holding->agencyHoldings->itemAvailability == 'copies available for loan and reservation';
+          $reservable = $available || $holding->agencyHoldings->itemAvailability == 'no copies available, but item can be reserved';
 
           $data = array(
             'local_id' => $holding->itemId,
@@ -69,7 +65,7 @@ function openruth_availability_holdings($provider_ids, $reset = FALSE) {
               }
               else {
                 // Parse holdings information.
-                $holdings = _openruth_populate_holdings($item_holding);;
+                $holdings = _openruth_populate_holdings($item_holding);
                 $data['total_count'] = $holdings['total_count'];
                 $data['reservable_count'] = $holdings['reservable_count'];
                 $data['holdings'] = $holdings['holdings'];
@@ -102,17 +98,17 @@ function openruth_availability_holdings($provider_ids, $reset = FALSE) {
 function _openruth_periodicals_unique_holdings($holdings) {
   $unique_holdings = array();
   foreach ($holdings as $holding) {
-    $key = $holding['agencyBranchCode'];
+    $banch_code = $holding['agencyBranchCode'];
 
     // First iteration or new branch code.
-    if (empty($unique_holdings) || !isset($unique_holdings[$key])) {
-      $unique_holdings[$key] = $holding;
+    if (!isset($unique_holdings[$banch_code])) {
+      $unique_holdings[$banch_code] = $holding;
       continue;
     }
 
     // Same branch; increase copiesCount and copiesAvailableCount.
-    $unique_holdings[$key]['copiesCount'] += $holding['copiesCount'];
-    $unique_holdings[$key]['copiesAvailableCount'] += isset($holding['copiesAvailableCount']) ? $holding['copiesAvailableCount'] : 0;
+    $unique_holdings[$banch_code]['copiesCount'] += $holding['copiesCount'];
+    $unique_holdings[$banch_code]['copiesAvailableCount'] += isset($holding['copiesAvailableCount']) ? $holding['copiesAvailableCount'] : 0;
   }
   return $unique_holdings;
 }
