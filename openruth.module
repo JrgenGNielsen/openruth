@@ -433,13 +433,20 @@ function _openruth_user_status($creds = NULL, $reset = FALSE) {
  */
 function openruth_seek_reserved_item($faust_number) {
   global $user;
+
+  if (!function_exists('openruth_reservation_list')) {
+    include_once(drupal_get_path('module', 'openruth') . '/includes/openruth.reservation.inc');
+  }
+
   $orders = openruth_reservation_list($user);
   $item = FALSE;
 
   foreach ($orders as $order) {
-    if ($order->ding_entity_id == ding_provider_build_entity_id($faust_number)) {
-      $item = $order;
-      break;
+    foreach ($order as $reservation) {
+      if ($reservation->ding_entity_id == ding_provider_build_entity_id($faust_number)) {
+        $item = $reservation;
+        break 2;
+      }
     }
   }
 
@@ -512,7 +519,7 @@ function openruth_profile2_load($entities) {
  * Alter user profile view with SMS fee.
  */
 function openruth_field_attach_view_alter(&$output, $context) {
-  if (isset($output['field_alma_sms'][0]['#markup'])) {
+  if (isset($output['field_openruth_mobile_phone'][0]['#markup'])) {
     $ding_user_fee_sms = variable_get('ding_user_fee_sms', t('Notice that there is a fee for receiving a SMS'));
     if ($ding_user_fee_sms) {
       $output['field_openruth_mobile_phone'][0]['#markup'] .= '<span class="notice-sms">(' . $ding_user_fee_sms . ')</span>';
